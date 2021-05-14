@@ -22,6 +22,7 @@ def parse_dns(fileContent)
   dns_records = records.map { |line| line.strip }
 
   data = {}
+  # here i am converting the data into a hash
   dns_records.select { |line| line[0] == "A" or line[0] == "C" }.map do |line|
     splitted_line = line.split(", ")
     data[splitted_line[1]] = splitted_line[2]
@@ -30,11 +31,14 @@ def parse_dns(fileContent)
 end
 
 def resolve(dns_records, lookup_chain, domain)
+  # Here i am checking if the domain is present or not
   if dns_records.keys.include? domain
     lookup_chain.push(dns_records[domain])
     domain = lookup_chain.last
     resolve(dns_records, lookup_chain, domain)
   else
+    # if the lookup_chain length is 1 ,the user have given the wrong domain name
+    # if it is greater than 1,it will return the ip address
     if (lookup_chain.length > 1)
       return lookup_chain
     else
