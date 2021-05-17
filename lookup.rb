@@ -19,21 +19,25 @@ dns_raw = File.readlines("zone.txt")
 def parse_dns(fileContent)
   # select is used to filter the data
   records = fileContent.select { |line| line[0] != "#" }
-  dns_records = records.map { |line| line.strip }
+  dns_records = records.map { |line| line.strip.split(", ") }
 
-  data = {}
-  # here i am converting the data into a hash
-  dns_records.select { |line| line[0] == "A" or line[0] == "C" }.map do |line|
-    splitted_line = line.split(", ")
-    data[splitted_line[1]] = splitted_line[2]
+  records = {}
+  # here i am converting the data into a hash, Type is nothing but the A record and cName records
+  dns_records.map do |line|
+    if !line.empty?
+      records[line[1]] = {
+        type: line[0],
+        target: line[2],
+      }
+    end
   end
-  return data
+  return records
 end
 
 def resolve(dns_records, lookup_chain, domain)
   # Here i am checking if the domain is present or not
-  if dns_records.keys.include? domain
-    lookup_chain.push(dns_records[domain])
+  if dns_records[domain] != nil
+    lookup_chain.push(dns_records[domain][:target])
     domain = lookup_chain.last
     resolve(dns_records, lookup_chain, domain)
   else
