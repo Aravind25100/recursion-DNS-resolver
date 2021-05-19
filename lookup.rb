@@ -42,11 +42,12 @@ def resolve(dns_records, lookup_chain, domain)
     resolve(dns_records, lookup_chain, domain)
   else
     # if the lookup_chain length is 1 ,the user have given the wrong domain name
-    # if it is greater than 1,it will return the ip address
-    if (lookup_chain.length > 1)
+    # if it is greater than 1 and it has a ip address,it will return the DNS result set
+    if (lookup_chain.length > 1 and dns_records[lookup_chain[-2]][:type] == "A")
       return lookup_chain
     else
-      puts "Error: record not found for #{domain}"
+      # lookup_chain[0] is a domain name
+      puts "Error: record not found for #{lookup_chain[0]}"
       exit
     end
   end
